@@ -773,6 +773,8 @@ elseif has('macunix')
     if has('gui_running')
         set macmeta " required to interpret alt/option as meta
     else
+        " NOTE: Use WinResizer Plugin for MacOs Terminal
+        "
         " this doesn't really work on MacVim as it screws up hjkl in command
         " mode must hit ESC twice when exiting insert mode for some reason`
         "execute "set <M-h>=\eh"
