@@ -28,7 +28,7 @@
 " Instead of join lines (j) then removing spaces, this does it for you:
 " gJ  join lines without inserting space
 " gD  search for word under the cursor
-
+"
 " nnoremap – Allows you to map keys in normal mode.
 " inoremap – Allows you to map keys in insert mode.
 " vnoremap – Allows you to map keys in visual mode.
@@ -83,7 +83,9 @@ set autoindent   " always set autoindenting on
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
 set encoding=utf-8 " set file encoding
 set expandtab    " In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
-"set filetype=unix     " auto use Unix line endings (LF)
+if has('unix') || has('macunix')
+    set filetype=unix     " auto use Unix line endings (LF)
+endif
 set fileformat=unix " file mode is unix
 set hidden       " allow switching buffers without saving current modified buffer
 set history=50   " keep 50 lines of command line history
@@ -178,6 +180,7 @@ endif
 " https://github.com/junegunn/vim-plug
 "*****************************************************************************
 if b:workpc
+
     " Using Pathogen at work
     execute pathogen#infect()
 
@@ -198,47 +201,52 @@ if b:workpc
 
     " ignore some files by default
     "let NERDTreeIgnore = ['\.d$', '\.o$', '\.gcno$']
-else
+elseif has("macunix") || has("unix")
+
     " Using VIM-PLUG at home
     " :PlugInstall - install new plugins
     " :PlugUpdate  - periodically update plugins
     " :PlugStatus  - list loaded plugins
     " :PlugClean   - remove plugins
-    call plug#begin(b:vimdir.'/plugged')
-    let g:plug_window = 'topleft new'
-    Plug 'https://github.com/simeji/winresizer' " Ctrl-E
-    "Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --no-bash' }
-    "Plug 'preservim/nerdtree'
-    Plug 'preservim/tagbar'
-    Plug 'vim-airline/vim-airline'
-    Plug 'vim-airline/vim-airline-themes'
-    Plug 'godlygeek/tabular'
-    Plug 'preservim/vim-markdown'
-    Plug 'dr-kino/cscope-maps'
-    Plug 'jamessan/vim-gnupg'
-    call plug#end()
+    try
+        runtime autoload/plug.vim
 
-    " alias LS to act as a directory listing
-    command! -bang -complete=dir -nargs=* LS
-                \ call fzf#run(fzf#wrap({'source': 'ls', 'dir': <q-args>}, <bang>0))
+        call plug#begin(b:vimdir.'/plugged')
+        let g:plug_window = 'topleft new'
+        Plug 'https://github.com/simeji/winresizer' " Ctrl-E
+        "Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --no-bash' }
+        "Plug 'preservim/nerdtree'
+        Plug 'preservim/tagbar'
+        Plug 'vim-airline/vim-airline'
+        Plug 'vim-airline/vim-airline-themes'
+        Plug 'godlygeek/tabular'
+        Plug 'preservim/vim-markdown'
+        Plug 'dr-kino/cscope-maps'
+        Plug 'jamessan/vim-gnupg'
+        call plug#end()
 
-    " to use fzf in Vim, add the following:
-    set rtp+=/usr/local/opt/fzf
+        " alias LS to act as a directory listing
+        command! -bang -complete=dir -nargs=* LS
+                    \ call fzf#run(fzf#wrap({'source': 'ls', 'dir': <q-args>}, <bang>0))
 
-    " support for fuzzy finder
-    let g:fzf_layout = { 'up': '~50%' }
+        " to use fzf in Vim, add the following:
+        set rtp+=/usr/local/opt/fzf
 
-    " setup tagbar
-    nnoremap <silent> <leader>t :TagbarToggle<CR>
+        " support for fuzzy finder
+        let g:fzf_layout = { 'up': '~50%' }
 
-    " customize winresizer
-    let g:winresizer_vert_resize = 1
-    let g:winresizer_horiz_resize = 1
+        " setup tagbar
+        nnoremap <silent> <leader>t :TagbarToggle<CR>
 
-    " use vim-airline-themes
-    let g:airline_theme='papercolor'
-    "let g:airline_theme='google_dark'
+        " customize winresizer
+        let g:winresizer_vert_resize = 1
+        let g:winresizer_horiz_resize = 1
 
+        " use vim-airline-themes
+        let g:airline_theme='papercolor'
+        "let g:airline_theme='google_dark'
+    catch
+    endtry
 endif
 
 
@@ -508,6 +516,14 @@ endif
 "
 " Switch syntax highlighting on, when the terminal has colors.
 "*****************************************************************************
+if &term == 'xterm-true-color'
+    hi clear
+    syntax reset
+    set termguicolors
+    execute 'source '.b:vimdir.'/gvimrc'
+    hi cursorline cterm=none
+endif
+
 if &t_Co > 2
     if has("syntax")
         "syntax reset
@@ -548,7 +564,7 @@ if &t_Co > 2
             "hi cursearch cterm=bold ctermbg=blue ctermfg=white
 
             if has("visual")
-                hi visual ctermbg=white
+                hi visual cterm=none ctermfg=black ctermbg=grey
             endif
 
             " color for the vertical split that separates windows
@@ -557,7 +573,7 @@ if &t_Co > 2
             endif
 
             " color for the 80 char line limit vertical bar
-            hi colorcolumn ctermfg=fg ctermbg=52
+            hi colorcolumn ctermfg=none ctermbg=52
             "hi statusline cterm=none ctermfg=white ctermbg=24
 
         endif " if &background == "dark"
@@ -748,12 +764,12 @@ nnoremap <C-k> <c-w>k
 nnoremap <C-l> <c-w>l
 
 " Maps Alt-[h,j,k,l] to resizing a window split
-if b:workpc
+if b:workpc || has("unix")
     nnoremap <A-h> <c-w>:vertical :resize -1<CR>
     nnoremap <A-j> <c-w>:resize +1<CR>
     nnoremap <A-k> <c-w>:resize -1<CR>
     nnoremap <A-l> <c-w>:vertical :resize +1<CR>
-else
+elseif has('macunix')
     if has('gui_running')
         set macmeta " required to interpret alt/option as meta
     else
