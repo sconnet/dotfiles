@@ -1,0 +1,127 @@
+" ----------------------------------------------------------------------------
+"  ~/vimfiles/gvimrc
+"
+" config for when gvim is run
+"
+" Notes:
+"     this is a really beautiful color! DeepSkyBlue4=#005f87
+" ----------------------------------------------------------------------------
+
+" prevents MacVim from applying its own colorscheme (see :h
+" macvim-colorscheme).
+if has("macunix") && !has('macvim_skip_colorscheme')
+    let macvim_skip_colorscheme = 1
+endif
+
+" default guioptions="egmrLtT" (see :help guioptions for descriptions)
+" must remove one at a time (-= to remove, += to add)
+if has("menu")
+    set guioptions-=L  " hide left-hand scrollbar on vert split
+    set guioptions-=M  " hide menu (don't source $VIMRUNTIME/menu.vim)
+    set guioptions-=R  " hide right-hand scrollbar on vert split
+    set guioptions-=b  " hide bottom (horizontal) scrollbar is present
+    set guioptions-=l  " hide left-hand scrollbar on vert split
+    set guioptions-=m  " hide menu bar
+    set guioptions-=r  " hide right-hand scrollbar
+endif
+
+if has("toolbar")
+    set guioptions-=T  " hide toolbar
+endif
+
+if has("macunix")
+    set macligatures
+endif
+
+set lines=38 columns=90
+
+if has("macunix")
+    set guifont=IntelOne\ Mono:h16
+else
+    set guifont=Roboto\ Mono:h12:cANSI
+endif
+
+" bright foreground for dark colorschemes
+set background=dark
+
+" other great options:
+"     torte,desert,solarized,darkblue,badwolf,asu1dark,lucius,obsidian,dosbox-black
+colorscheme torte
+
+"-----------------------------------------------------------------------------
+" I don't know why these are being executed in the vimrc file. The variable
+" &t_Co is greater than 2.
+if has("syntax")
+    "syntax reset
+    syntax enable
+    syntax on
+endif
+
+if has("extra_search")
+    set hlsearch    " highlight all search results
+    set incsearch   " show incremental search results as you type
+endif
+
+" make the vert split a space instead of the default "|"
+set fillchars=vert:\ " blank space 0x32
+
+" set an indicator at textwidth to indicate wrapping
+" 'colorcolumn' is a comma separated list of screen columns that
+" are highlighted with ColorColumn |hl-ColorColumn|.
+"example: set colorcolumn=4,80,120
+set colorcolumn=80
+
+" turn off underlining line numbers
+if !has("+syntax")
+    set cursorlineopt=both
+endif
+
+" Note that setting the 'cursorline' or 'cursorcolumn' options can
+" cause Vim to respond slowly, especially for large files or files
+" with long lines
+set cursorline
+"-----------------------------------------------------------------------------
+
+if &background == "light"
+    hi normal gui=none guifg=black guibg=white
+    hi cursorline gui=none guibg=darkblue
+else
+    hi normal gui=none guifg=white guibg=black
+    hi cursorline gui=none guibg=darkblue
+    hi search gui=none guifg=fg guibg=DeepSkyBlue4
+    hi incsearch gui=bold guifg=fg guibg=DeepSkyBlue4
+    hi cursearch gui=bold guifg=fg guibg=DeepSkyBlue4
+
+    if has("visual")
+        hi visual guibg=grey
+    endif
+
+    " really dark red
+    hi colorcolumn guifg=fg guibg=#320000
+endif
+
+if has("vertsplit")
+    hi vertsplit guibg=DeepSkyBlue4
+endif
+
+if has("spell")
+    " Word not recognized
+    hi clear SpellBad
+    hi SpellBad gui=underline guifg=lightblue
+
+    " Word not capitalized
+    hi clear SpellCap
+    hi SpellCap gui=underline guifg=red
+
+    " Word is rare
+    hi clear SpellRare
+    hi SpellRare gui=underline guifg=green
+
+    " Wrong spelling for selected region
+    hi clear SpellLocal
+    hi SpellLocal gui=underline guifg=yellow
+endif
+
+if has("statusline") && !exists("g:loaded_airline")
+    hi statusline guifg=white guibg=DeepSkyBlue4
+endif

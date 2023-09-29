@@ -1,0 +1,788 @@
+" ----------------------------------------------------------------------------
+"  ~/vimfiles/vimrc
+" ----------------------------------------------------------------------------
+" Useful things to remember:
+" default leader is \
+" let mapleader = "\"  (default)
+"
+" force syntax ":set syntax=c"
+"
+" Replace line feed character in document with nothing (where 0a is the hex of
+" the ASCII character to replace)
+" e.g. remove the ^@ in the SB console log files
+" :%s/\%x0a//g
+"
+" Don't forget to set environment variable HOME=C:\Users\connets
+" This tells gvim where to find the _vimrc file
+"
+" To abort a GIT message, use
+" :cq
+" Returns an error code to OS so git will not continue with commit
+"
+" To remove ^M (CR) line endings:
+" :e ++ff=dos
+"
+" Toggle Spelling
+" <leader>s
+"
+" Instead of join lines (j) then removing spaces, this does it for you:
+" gJ  join lines without inserting space
+" gD  search for word under the cursor
+
+" nnoremap – Allows you to map keys in normal mode.
+" inoremap – Allows you to map keys in insert mode.
+" vnoremap – Allows you to map keys in visual mode.
+" nmap - Mapping on normal mode
+" cmap - Mapping on command mode
+" vmap - Mapping on visual mode"
+"
+" using Marks:
+" m{a-z} Lowercase marks are shared within a file
+" m{A-Z} Uppercase marks are shared among all files
+" `m backtick - Jump to exact position of the mark
+" 'm single quote - Jump to BOL that holds mark
+"
+" Text Object example:
+" using delete
+" d/<word> deletes from cursor to word (use slash)
+"
+" Check if a Vim Feature Exists
+" :echo has("diff")
+"
+" Check if a Vim option, function, varname, env var, etc. exists
+" :echo has("cscope")
+"
+" See all options and how they are set
+" :options
+"
+" See all remappings
+" :map
+" ----------------------------------------------------------------------------
+
+" Use Vim settings, rather than Vi settings (much better!). This must be "
+" first, because it changes other options as a side effect
+set nocompatible
+
+
+"*****************************************************************************
+" VIM CONFIG DIRECTORY
+"*****************************************************************************
+if has ("win32")
+    let b:vimdir = "~/vimfiles"
+    let b:workpc = 1
+elseif has("unix") || has("macunix")
+    let b:vimdir = "~/.vim"
+    let b:workpc = 0
+endif
+
+
+"*****************************************************************************
+" VIM FEATURES (:help feature-list)
+"*****************************************************************************
+set autoindent   " always set autoindenting on
+set backspace=indent,eol,start " allow backspacing over everything in insert mode
+set encoding=utf-8 " set file encoding
+set expandtab    " In Insert mode: Use the appropriate number of spaces to insert a <Tab>.
+"set filetype=unix     " auto use Unix line endings (LF)
+set fileformat=unix " file mode is unix
+set hidden       " allow switching buffers without saving current modified buffer
+set history=50   " keep 50 lines of command line history
+set ignorecase   " case insensitive searching
+set lazyredraw   " Do not redraw while executing macros
+"set linebreak   " Have lines wrap instead of continue off-screen
+set nobackup     " turn off since it slows things down
+set noerrorbells " this disables all visual flashing and audio bells
+set nojoinspaces " only insert 1 space after period, not two
+set noswapfile   " disable swap file
+"set nowrapscan  " stop when search hits top or bottom of file
+set number       " turn on line numbering
+set scrolloff=4  " scroll the buffer before the cursor reaches top/bottom of buffer
+set shiftwidth=4 " when indenting with '>', use 4 spaces width
+set showmatch    " show matching bracket
+set showmode     " show mode in status mode
+set smartcase    " Override the 'ignorecase' option if the search pattern contains upper case characters
+set smarttab     " smart tab handling for indenting
+set splitbelow   " split below and make current (:split)
+set splitright   " split right and make current (:vsplit)
+set tabstop=4    " show existing tab with 4 spaces width
+"set termguicolors " Gives vim access to a broader range of colors
+set textwidth=78 " Global column to word-wrap
+set verbose=0    " verbose message on startup (good for debug)
+set visualbell t_vb=  " flash screen instead of hearing bell
+set wrapmargin=1 " Number of characters from the right window border where wrapping starts
+
+if has("cryptv")
+	if v:version > 704 || (v:version == 704 && has('patch401'))
+        set cryptmethod=blowfish2 " encrypt with :X, requested key is any pass you want
+    endif
+endif
+
+if has("smartindent")
+    set smartindent  " smart auto identing
+endif
+
+
+"*****************************************************************************
+" ABBREVIATIONS
+"*****************************************************************************
+ab SJC Steve Connet
+
+
+"*****************************************************************************
+" VIM PATHS
+"*****************************************************************************
+execute 'set backupdir^='.b:vimdir.'/backupdir'
+execute 'set directory^='.b:vimdir.'/swapfiles'
+execute 'set runtimepath+='.b:vimdir.'/vimfiles'
+execute 'set undodir^='.b:vimdir.'/undodir'
+execute 'set viewdir^='.b:vimdir.'/viewdir'
+set noundofile
+if has("viminfo")
+    " see :help 'viminfo'  <-- yes, use single quotes
+    "set viminfo=%,<800,'10,/50,:100,h,f0,n~/.vim/cache/.viminfo
+    "            | |    |   |   |    | |  + viminfo file path
+    "            | |    |   |   |    | + file marks 0-9,A-Z 0=NOT stored
+    "            | |    |   |   |    + disable 'hlsearch' loading viminfo
+    "            | |    |   |   + command-line history saved
+    "            | |    |   + search history saved
+    "            | |    + files marks saved
+    "            | + lines saved each register (old name for <, vi6.2)
+    "            + save/restore buffer list
+    execute "set viminfo=%,<50,'10,/50,:100,h,f1,n".b:vimdir.'/viminfo'
+endif
+
+" update PATH environment variable
+if b:workpc && has("diff")
+    " put diff.exe from gnu (v2.8.7) in path before VIM diff.exe (v2.7)
+    let $PATH = 'C:\opensource\gnuwin32\bin\;' . $PATH
+endif
+
+" set path for finding files under the cursor with C-w C-f, can be command
+" seperated list of paths or with the 'find' command
+" default=.,,
+set path+=**;/
+if b:workpc
+    set path+=,/opensource**,/WindRiver6.7/vxworks-6.7/target
+endif
+
+
+"*****************************************************************************
+" PLUG-INS
+"
+" At home use vim-plug.
+"
+" At work use pathogen (vim-plug won't work because it
+" downloads plugins from the internet and work doesn't allow that.)
+"
+" Plugin Manager: Vim-Plug
+" https://github.com/junegunn/vim-plug
+"*****************************************************************************
+if b:workpc
+    " Using Pathogen at work
+    execute pathogen#infect()
+
+    " add list of bundle directory names to disable
+    let g:pathogen_disabled = []
+
+    " e.g., disable plantuml
+    "let g:pathogen_disabled = [plantuml]
+
+    " e.g., vim-fugitive requires at least vim 8.0
+    "if v:version < '800'
+    "    call add(g:pathogen_disabled, 'vim-fugitive-master')
+    "endif
+
+    " run nerdtree with C-n
+    "set runtimepath+=~/vimfiles/bundle/nerdtree-master
+    "nnoremap <C-n> :NERDTreeToggle<CR>
+
+    " ignore some files by default
+    "let NERDTreeIgnore = ['\.d$', '\.o$', '\.gcno$']
+else
+    " Using VIM-PLUG at home
+    " :PlugInstall - install new plugins
+    " :PlugUpdate  - periodically update plugins
+    " :PlugStatus  - list loaded plugins
+    " :PlugClean   - remove plugins
+    call plug#begin(b:vimdir.'/plugged')
+    let g:plug_window = 'topleft new'
+    Plug 'https://github.com/simeji/winresizer' " Ctrl-E
+    "Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --no-bash' }
+    "Plug 'preservim/nerdtree'
+    Plug 'preservim/tagbar'
+    Plug 'vim-airline/vim-airline'
+    Plug 'vim-airline/vim-airline-themes'
+    Plug 'godlygeek/tabular'
+    Plug 'preservim/vim-markdown'
+    Plug 'dr-kino/cscope-maps'
+    Plug 'jamessan/vim-gnupg'
+    call plug#end()
+
+    " alias LS to act as a directory listing
+    command! -bang -complete=dir -nargs=* LS
+                \ call fzf#run(fzf#wrap({'source': 'ls', 'dir': <q-args>}, <bang>0))
+
+    " to use fzf in Vim, add the following:
+    set rtp+=/usr/local/opt/fzf
+
+    " support for fuzzy finder
+    let g:fzf_layout = { 'up': '~50%' }
+
+    " setup tagbar
+    nnoremap <silent> <leader>t :TagbarToggle<CR>
+
+    " customize winresizer
+    let g:winresizer_vert_resize = 1
+    let g:winresizer_horiz_resize = 1
+
+    " use vim-airline-themes
+    let g:airline_theme='papercolor'
+    "let g:airline_theme='google_dark'
+
+endif
+
+
+"*****************************************************************************
+" GLOBALS
+"*****************************************************************************
+let g:load_doxygen_syntax=1 " enable doxygen syntax higlighting
+
+" plugin markdown (SJC TODO: should this go in 'after/' dir?)
+let g:vim_markdown_autowrite = 1
+let g:vim_markdown_conceal = 2
+let g:vim_markdown_conceal_code_blocks = 0
+let g:vim_markdown_edit_url_in = 'tab'
+let g:vim_markdown_follow_anchor = 1
+let g:vim_markdown_frontmatter = 1
+let g:vim_markdown_math = 1
+let g:vim_markdown_strikethrough = 1
+let g:vim_markdown_toml_frontmatter = 1
+
+if b:workpc
+    if has("python")
+        let g:python_host_prog='C:\Program Files (x86)\Python27\python.exe'
+    endif
+
+    if has("python3")
+        let g:python3_host_prog='PLEASE INSTALL AND SET'
+    endif
+else
+    let g:GPGDefaultRecipients=["<clu@cox.net>","<sconnet@gmail.com>","<steve.connet@cox.net"]
+    let g:GPGPreferArmor=1      " default 0
+    let g:GPGPreferSign=0       " default 0
+    let g:GPGPreferSymmetric=0  " default 0
+    let g:GPGUseAgent=1         " default 1
+
+    if has("python")
+        let g:python_host_prog='/usr/bin/python'
+    endif
+
+    if has("python3")
+        let g:python3_host_prog='/usr/local/bin/python3'
+    endif
+endif
+
+
+"*****************************************************************************
+" COMPLETION chords (use while in insert-mode)
+"     "keyword"       Keyword completion |i_CTRL-X_CTRL-N|
+"     "ctrl_x"        Just pressed CTRL-X |i_CTRL-X|
+"     "whole_line"    Whole lines |i_CTRL-X_CTRL-L|
+"     "files"         File names |i_CTRL-X_CTRL-F|
+"     "tags"          Tags |i_CTRL-X_CTRL-]|
+"     "path_defines"  Definition completion |i_CTRL-X_CTRL-D|
+"     "path_patterns" Include completion |i_CTRL-X_CTRL-I|
+"     "dictionary"    Dictionary |i_CTRL-X_CTRL-K|
+"     "us"            Thesaurus |i_CTRL-X_CTRL-T|
+"     "cmdline"       Vim Command line |i_CTRL-X_CTRL-V|
+"     "function"      User defined completion |i_CTRL-X_CTRL-U|
+"     "omni"          Omni completion |i_CTRL-X_CTRL-O|
+"     "spell"         Spelling suggestions |i_CTRL-X_s|
+"
+"*****************************************************************************
+" THESAURUS
+" i C-x C-t alternative word
+execute 'set thesaurus+='.b:vimdir.'/spell/mthesaur.txt'
+
+
+"*****************************************************************************
+" SPELLING OPTIONS
+"*****************************************************************************
+if has("spell")
+    " Spelling usage:
+    " ]s  Move to the next misspelled word
+    " [s  Move to the previous misspelled word
+    " z=  Provide suggestions (you can entire the suggestion ID and enter to
+    "     replace the word)
+    " zg  Add a word to the dictionary
+    setlocal nospell
+
+    " Toggle spell checking (! means toggle)
+    nnoremap <silent> <leader>s :setlocal spell! spelllang=en_us<cr>
+
+    execute 'set spellfile='.b:vimdir.'/spell/en.utf-8.add'
+
+    " Autocomplete with dictionary words when spell check is on (see help complete)
+    " default = ".,w,b,u,t,i", which means to scan:
+    "   1. the current buffer
+    "   2. buffers in other windows
+    "   3. other loaded buffers
+    "   4. unloaded buffers
+    "   5. tags
+    " Use C-n and C-p while in insert mode
+    set complete+=kspell
+
+    " Colors for words that failed spell check
+    " Word not recognized
+    hi clear SpellBad
+    hi SpellBad cterm=underline ctermfg=blue
+
+    " Word not capitalized
+    hi clear SpellCap
+    hi SpellCap cterm=underline ctermfg=red
+
+    " Word is rare
+    hi clear SpellRare
+    hi SpellRare cterm=underline ctermfg=green
+
+    " Wrong spelling for selected region
+    hi clear SpellLocal
+    hi SpellLocal cterm=underline ctermfg=yellow
+endif
+
+
+"*****************************************************************************
+" DIRECTORY OPTIONS
+"*****************************************************************************
+if b:workpc
+    " When on, ':autocmd', shell and write commands are not allowed in
+    " '.vimrc' and '.exrc' in the current directory and map commands are
+    " displayed
+    set secure
+else
+    set nosecure
+endif
+
+if has("autochdir")
+    set autochdir                 " screws up cscope (relative paths)
+endif
+
+
+"*****************************************************************************
+" WINDOW TITLE
+"*****************************************************************************
+if has("title")
+    " uses status line rules for formatting
+    "set titlestring=%t%(\ %M%)%(\ (%{expand(\"%:~:.:h\")})%)%(\ %a%)
+    " %F Full path to the file in the buffer.
+    " %o: Byte number in file of byte under cursor, first byte is 1.
+    " %a: Argument list status as in default title.
+    set title titlestring=%F\ %a\ (%o\ of\ %{line2byte('$')+len(getline('$'))}\ bytes) titlelen=0
+endif
+
+
+"*****************************************************************************
+" SESSION OPTIONS
+"*****************************************************************************
+if has("mksession")
+    " :mks (or \ss) to create session
+    " :mks (or \sr) ~/mysession.vim (for named session)
+    " To Restore a Session (:source, :so, vim -S)
+    let g:session_dir = b:vimdir.'/session'
+
+    set ssop-=options    " do not store global and local values in a session
+    set ssop-=folds      " do not store folds
+
+    " exec required if remapping includes a variable, apparently
+    exec 'nnoremap <Leader>ss :mks! ' . g:session_dir . '/<C-D>'
+    exec 'nnoremap <Leader>sr :so ' . g:session_dir. '/<C-D>'
+endif
+
+
+"*****************************************************************************
+" COMMAND LINE AUTOCOMPLETION
+"*****************************************************************************
+if has("wildmenu")
+    set wildmenu     " command line auto completion when hitting <tab>
+    set wildmode=list:longest,longest:full   " Better command line completion
+endif
+
+
+"*****************************************************************************
+" CODE FOLDING
+"*****************************************************************************
+if has("folding")
+    "set foldcolumn=2
+    "set foldmethod=manual
+    set nofoldenable " turn off folding (zR to unfold, zM to fold)
+endif
+
+
+"*****************************************************************************
+" CODE TAG TOOLS
+"*****************************************************************************
+if has("emacs_tags")
+    set tags=./tags,tags;$HOME " tags file locations
+endif
+
+" CSCOPE
+" options: https://7id.xray.aps.anl.gov/software/vim/options.html#'cscopetag'
+if has("cscope")
+    " :help cscope_options
+    "set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+    " path to exe
+    if b:workpc
+        set cscopeprg=C:/opensource/bin/cscope.exe
+    else
+        set cscopeprg=/usr/local/bin/cscope
+    endif
+
+    " cscopetag - use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
+    set cst
+
+    " cscopetagorder - check cscope for definition of a symbol before checking
+    " ctags: set to 1 if you want the reverse search order.
+    set csto=0
+
+    " cscopepathcomp - how many components of a file's path to display.
+    set cspc=3
+
+    " add any database in current dir
+    if filereadable("cscope.out")
+        cs add cscope.out
+    else " search cscope.out elsewhere
+        let cscope_file=findfile("cscope.out", ".;")
+        if !empty(cscope_file) && filereadable(cscope_file)
+            exe "cs add" cscope_file
+        else " cscope file not found
+            if $CSCOPE_DB != ""
+                cs add $CSCOPE_DB " add db pointed to by env var
+            endif
+        endif
+    endif
+    " cscopeverbose - show msg when any other cscope db added
+    set csverb
+endif
+
+
+"*****************************************************************************
+" CMDLINE INFO
+"*****************************************************************************
+if has("cmdline_info")
+    set showcmd " display incomplete commands / show typed command in status bar
+    set ruler   " Show the line and column number of the cursor position
+endif
+
+
+"*****************************************************************************
+" CLIPBOARD
+"*****************************************************************************
+if has("clipboard")
+    " make y and p copy and paste to the 'global' buffer that is used by other apps
+    set clipboard+=unnamed
+endif
+
+
+"*****************************************************************************
+" STATUS LINE OPTIONS
+"*****************************************************************************
+if has("statusline") && !exists("g:loaded_airline")
+    hi statusline ctermfg=white ctermbg=blue
+endif
+
+
+"*****************************************************************************
+" DEVICE SUPPORT
+"
+" Enable mouse support (even in terminals)
+"*****************************************************************************
+if has("mouse")
+    set mouse=a  " use mouse in all modes (n,v,i,c,h see help mouse)
+    behave mswin
+endif
+
+
+"*****************************************************************************
+" COLOR CUSTOMIZATIONS
+"
+" Switch syntax highlighting on, when the terminal has colors.
+"*****************************************************************************
+if &t_Co > 2
+    if has("syntax")
+        "syntax reset
+        syntax enable
+        syntax on
+    endif
+
+    if has("extra_search")
+        set hlsearch    " highlight all search results
+        set incsearch   " show incremental search results as you type
+    endif
+
+    " only set stuff in terminal - gui stuff is set in gvimrc
+    if !has("gui_running")
+        set background=dark " bright foreground for dark colorschemes
+        "colorscheme pablo
+        colorscheme torte
+
+        " ---------------------------------------------------------------------
+        " override some colorscheme elements with my own preferences
+        " ---------------------------------------------------------------------
+        " normal colors when "fg" and "bg" are specified
+        "    hi Normal term=none      cterm=none
+        "    hi Normal ctermfg=white  ctermbg=0
+        "    hi Normal guifg=white    guibg=black
+        if &background == "light"
+            hi normal cterm=none ctermfg=black ctermbg=white
+            hi cursorline cterm=none ctermbg=254
+        else
+            "hi Normal cterm=none ctermfg=white ctermbg=black
+            hi normal cterm=none ctermfg=7 ctermbg=black
+            hi cursorline cterm=none ctermbg=17
+            hi search cterm=bold ctermbg=yellow ctermfg=blue
+            "hi search cterm=bold ctermbg=blue ctermfg=white
+            hi incsearch cterm=bold ctermbg=yellow ctermfg=blue
+            "hi incsearch cterm=bold ctermbg=blue ctermfg=white
+            hi cursearch cterm=bold ctermbg=yellow ctermfg=blue
+            "hi cursearch cterm=bold ctermbg=blue ctermfg=white
+
+            if has("visual")
+                hi visual ctermbg=white
+            endif
+
+            " color for the vertical split that separates windows
+            if has("vertsplit")
+                hi vertsplit cterm=none ctermbg=24
+            endif
+
+            " color for the 80 char line limit vertical bar
+            hi colorcolumn ctermfg=fg ctermbg=52
+            "hi statusline cterm=none ctermfg=white ctermbg=24
+
+        endif " if &background == "dark"
+    endif " if !has("gui_running")
+
+    " make the vert split a space instead of the default "|"
+    set fillchars=vert:\ " blank space 0x32
+
+    " set an indicator at textwidth to indicate wrapping
+    " 'colorcolumn' is a comma separated list of screen columns that
+    " are highlighted with ColorColumn |hl-ColorColumn|.
+    "example: set colorcolumn=4,80,120
+    set colorcolumn=80
+
+    " turn off underlining line numbers
+    if v:version >= 800
+        set cursorlineopt=screenline
+    endif
+
+    " Note that setting the 'cursorline' or 'cursorcolumn' options can
+    " cause Vim to respond slowly, especially for large files or files
+    " with long lines
+    set cursorline
+
+endif " if &t_Co > 2
+
+
+"*****************************************************************************
+" NETRW CUSTOMIZSATION (browse files locally and over network)
+"*****************************************************************************
+" Will open Netrw in the directory of the current file
+if b:workpc
+    " at work we have vim 7.4 which doesn't have Lexplore
+    nnoremap <silent> <C-n> :Explore %:p:h<cr>
+else
+    nnoremap <silent> <C-n> :Lexplore %:p:h<CR>
+endif
+
+let g:netrw_altv           = 0 " left split window
+let g:netrw_banner         = 0 " suppress the banner
+let g:netrw_browse_split   = 0 " re-use same window when opening file
+"let g:netrw_chgwin        = winnr()
+let g:netrw_ctags          = "ctags" " external program used to create tags
+let g:netrw_fastbrowse     = 2 " only obtain dir content when no seen before
+let g:netrw_hide           = 0 " show all
+let g:netrw_home           = b:vimdir."/netrw" " home dir where bookmarks and history are saved
+let g:netrw_keepdir        = 0 " sync cwd and browsing dir
+let g:netrw_liststyle      = 3 " tree style listing
+let g:netrw_localcopydircmd = 'cp -r' " recurse
+let g:netrw_retmap         = 1 " left mouse returns to Explore
+let g:netrw_silent         = 1 " transfers done silently
+let g:netrw_special_syntax = 1 " If true, syntax highlight special files
+let g:netrw_winsize        = 50  " specify initial size of new windows
+
+" Highlight marked files in the same way search matches are
+hi! link netrwMarkFile Search
+
+
+"*****************************************************************************
+" AUTOCMD
+"*****************************************************************************
+if has("autocmd")
+    " This does 3 things. Enables filetype detection, enables
+    " filetype-specific scripts (ftplugins), and enables file-type specific
+    " indent scripts.
+    filetype plugin indent on
+
+    " do something on startup
+    "autocmd VimEnter * echo "vimrc Nr. of Colors: " . &t_Co
+
+    " using global g:load_doxygen_syntax instead
+    "augroup doxygen_syntax
+    "    autocmd!
+    "    autocmd BufRead,BufNewFile *.h,*.c,*.cpp set filetype=c.doxygen
+    "augroup END
+
+    augroup auto_save
+        autocmd!
+        " auto save any time the buffer loses focus
+        "au FocusLost * silent! wa
+        "au BufReadPre //* :NoMatchParen " disable when loading network file
+
+        " Auto remove whitespace on save for all files
+        autocmd BufWritePre * :%s/\s\+$//e
+
+        "" auto source vimrc when leaving the buffer
+        " clear group in case resourcing vimrc
+        "autocmd BufLeave b:vimdir/vimrc :source b:vimdir/vimrc
+    augroup END
+
+    augroup c_cpp_src
+        autocmd!
+
+        " look for this plugin - do I already have it?
+        "autocmd FileType c setlocal ofu=ccomplete#CompleteCpp
+
+        " does seem to do anything
+        autocmd BufEnter *.cpp,*.cc,*.c compiler gcc
+
+        "autocmd FileType c,cpp,cc set makeprg=gcc\ -o\ %<\ %
+        "set makeprg=gcc\ -O2\ -g\ -Wall\ -Wextra\ -o\ %<\ %\ -lm
+        set makeprg=gcc\ -O0\ -g\ -o\ %<\ %\ -lm\ -lstdc++
+        set autowrite " auto write the contents of the modified file before compiling
+
+        " call 'make' with \c
+        nnoremap <Leader>c :make<CR>
+
+        " auto open quick fix window if compiler errors (TODO: figure this
+        " out, what are the options here - seems to interfere with cscope when
+        " using cscope with QuickFix window
+        if has("quickfix")
+            autocmd QuickFixCmdPost [^l]* nested cwindow
+            autocmd QuickFixCmdPost    l* nested lwindow
+        endif
+    augroup END
+
+    augroup text_and_spelling
+        autocmd!
+
+        " limit wordwrap on text files
+        autocmd FileType text setlocal textwidth=78
+
+        if b:workpc
+            " set when we edit AstroRT flat files or FSW autocoded input files
+            autocmd BufRead *_decom.txt,*_tlmdb.txt,CMDMasterlist*.txt,CMDParameterM*.txt,auto_*.txt,fsw-*.txt setlocal nowrap tw=0 wm=0
+        endif
+
+        if has("spell")
+            autocmd BufRead *.txt setlocal spell " only spell check txt files
+            autocmd FileType markdown setlocal spell " Spell-check Markdown files
+            autocmd FileType gitcommit setlocal spell " Spell-check Git messages
+            "autocmd BufRead,BufNewFile *.md setlocal spell spelllang=en_us
+        endif
+    augroup END
+
+    augroup my_misc_group
+        autocmd!
+
+        if !b:workpc
+            autocmd BufNewFile,BufRead /tmp/*mutt* set noautoindent filetype=mail wm=0 tw=78 nonumber digraph nolist nopaste
+        endif
+
+        " set end of line column marker to dark dark red (note: console uses
+        " xterm256 color names/numbers, 52 is equivalent to guibg=#5F0000)
+        "autocmd VimEnter * hi colorcolumn ctermfg=fg ctermbg=52
+    augroup end
+else
+    set autoindent        " always set autoindenting on
+endif " has("autocmd")
+
+
+"*****************************************************************************
+" KEY BINDING
+"*****************************************************************************
+" remove Q ex mode
+nnoremap Q <Nop>
+
+" copy filename (foo.txt)
+nnoremap <leader>f :let @+=expand("%:t")<CR>
+
+" copy absolute pathname (/something/src/foo.txt)
+nnoremap <leader>p :let @+=expand("%:p")<CR>
+
+" close buffer but keep split window
+"nnoremap <leader>d :bp<BAR>bd #<CR>
+
+" buffer completely wipe but keep split window
+nnoremap <leader>w :bp<BAR>bw #<CR>
+
+" Cycle through buffers
+nnoremap <Tab> :bnext<CR>
+nnoremap <S-Tab> :bprevious<CR>
+
+" Maps Alt-[s.v] to horizontal and vertical split respectively
+nnoremap <A-s> :split<CR>
+nnoremap <A-v> :vsplit<CR>
+nnoremap <A-t> :tabnew<CR>
+
+" tabs
+" :tabn is <C-Pgup>
+" :tabp is <C-Pgdn>
+" go to last tab is g<Tab>
+
+" Navigate vim splits without C-w
+nnoremap <C-h> <c-w>h
+nnoremap <C-j> <c-w>j
+nnoremap <C-k> <c-w>k
+nnoremap <C-l> <c-w>l
+
+" Maps Alt-[h,j,k,l] to resizing a window split
+if b:workpc
+    nnoremap <A-h> <c-w>:vertical :resize -1<CR>
+    nnoremap <A-j> <c-w>:resize +1<CR>
+    nnoremap <A-k> <c-w>:resize -1<CR>
+    nnoremap <A-l> <c-w>:vertical :resize +1<CR>
+else
+    if has('gui_running')
+        set macmeta " required to interpret alt/option as meta
+    else
+        " this doesn't really work on MacVim as it screws up hjkl in command
+        " mode must hit ESC twice when exiting insert mode for some reason`
+        "execute "set <M-h>=\eh"
+        "execute "set <M-j>=\ej"
+        "execute "set <M-k>=\ek"
+        "execute "set <M-l>=\el"
+    endif
+
+    nnoremap <M-h> <c-w>:vertical :resize -1<CR>
+    nnoremap <M-j> <c-w>:resize +1<CR>
+    nnoremap <M-k> <c-w>:resize -1<CR>
+    nnoremap <M-l> <c-w>:vertical :resize +1<CR>
+endif
+
+" convenient keymapping for mutt
+if !b:workpc
+    " extract urls with urlview
+    nnoremap <silent> <leader>u :!urlview % <CR>
+endif
+
+" This selects the default regexp engine.
+"    The possible values are:
+"    0  automatic selection
+"    1  old engine
+"    2  NFA engine
+"set regexpengine=1
+
+let $MYVIMRC=b:vimdir.'/vimrc'
+let $MYGVIMRC=b:vimdir.'/gvimrc'
