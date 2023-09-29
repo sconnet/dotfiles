@@ -1,0 +1,7 @@
+# bind command key from C-a to C-o so it does not interfere with emacs or shell
+escape ^Oo
+defutf8 on
+#nethack on
+startup_message off
+hardstatus on
+hardstatus lastline

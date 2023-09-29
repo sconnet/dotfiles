@@ -1,0 +1,2 @@
+Redact personal info in mutt configuration files before uploading.
+

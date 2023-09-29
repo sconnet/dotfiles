@@ -1,0 +1,13 @@
+# Options file for astyle coding formatter/beautifier
+
+# override the defaults here
+style=allman
+add-brackets
+align-pointer=name
+align-reference=name
+break-after-logical
+convert-tabs
+indent-switches
+unpad-paren
+pad-oper
+indent=spaces=4

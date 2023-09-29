@@ -1,0 +1,21 @@
+[user]
+	name = <redacted>
+	email = <redacted>
+	email = {ID+}
+[alias]
+    a = "!git config --get-regexp '^alias\\.' | cut -c 7- | sed 's/ / = /'"
+    br = branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate
+    ca = commit -a
+    ci = commit
+    co = checkout
+    done = !git push origin HEAD
+    dv = difftool -t vimdiff -y
+    l = log --graph --oneline
+    last = log -1 HEAD --stat
+    lg = !git log --pretty=format:\"%C(magenta)%h%Creset -%C(red)%d%Creset %s %C(dim green)(%cr) [%an]\" --abbrev-commit -30
+    ls = ls-files
+    res = !git reset --hard
+    s = status
+    save = !git add -A && git commit -m 'chore: commit save point
+    undo = reset HEAD~1 --mixed
+    unstage = reset HEAD --
