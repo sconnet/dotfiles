@@ -1,0 +1,22 @@
+! NOTE: this isn't a good solution because it doesn't work for all apps on
+! modern X systems
+! Use desktop manager settings instead
+! Main Menu -> Preferences -> Keyboard: Layouts Tab -> Options: Caps Lock
+! behavior: Make Caps Lock an additional Ctrl
+! or Ctrl position: Caps Lock sa Ctrl
+
+!
+! Swap Caps_Lock and Control_R
+! TODO figure out, doesn't quite work - caps lock is acting like Ctrl-F
+!
+!remove Lock = Caps_Lock
+!remove Control = Control_R
+!keysym Control_R = Caps_Lock
+!keysym Caps_Lock = Control_R
+!add Lock = Caps_Lock
+!add Control = Control_L
+
+!
+! Swap scrolling to be like MacOS (called Natural Scrolling)
+!
+!pointer = 1 2 3 5 4 7 6 8 9 10 11 12
