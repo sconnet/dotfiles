@@ -20,14 +20,7 @@ if has('menu')
     set guioptions-=m  " hide menu bar
 endif
 
-" hide scrollbars
-set guioptions-=L  " hide left-hand scrollbar on vert split
-set guioptions-=R  " hide right-hand scrollbar on vert split
-set guioptions-=b  " hide bottom (horizontal) scrollbar is present
-set guioptions-=l  " hide left-hand scrollbar on vert split
-set guioptions-=r  " hide right-hand scrollbar
-
-if has('toolbar')
+if has("toolbar")
     set guioptions-=T  " hide toolbar
 endif
 
@@ -42,7 +35,7 @@ if has('unix') || has('macunix')
     "set guifont=Monospace:h10
     set guifont=Ubuntu\ Mono\ 12
 else
-    set guifont=Roboto\ Mono:h12:cANSI
+    set guifont=Roboto_Mono:h10:cANSI
 endif
 
 " bright foreground for dark colorschemes
@@ -66,7 +59,8 @@ else
         hi visual guibg=grey
     endif
 
-    hi colorcolumn guifg=fg guibg=#320000 " really dark red
+    " really dark red (R=32h G=00h B=00h)
+    hi colorcolumn guifg=fg guibg=#320000
 endif
 
 if has('vertsplit')
@@ -77,18 +71,22 @@ if has('spell')
     " Word not recognized
     hi clear SpellBad
     hi SpellBad gui=undercurl,bold guifg=black guibg=white
+    "hi SpellBad gui=underline guifg=lightblue
 
     " Word not capitalized
     hi clear SpellCap
     hi SpellCap gui=undercurl,bold guifg=red guibg=yellow
+    "hi SpellCap gui=underline guifg=red
 
     " Word is rare
     hi clear SpellRare
     hi SpellRare gui=undercurl,bold guifg=black guibg=green
+    "hi SpellRare gui=underline guifg=green
 
     " Wrong spelling for selected region
     hi clear SpellLocal
     hi SpellLocal gui=undercurl,bold guifg=yellow guibg=blue
+    "hi SpellLocal gui=underline guifg=yellow
 endif
 
 if has('statusline') && !exists('g:loaded_airline')

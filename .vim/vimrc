@@ -70,7 +70,10 @@
 
 " Use Vim settings, rather than Vi settings (much better!). This must be
 " first, because it changes other options as a side effect
-set nocompatible
+if &compatible
+    echom "compatible mode detected - setting nocompatible!"
+    set nocompatible
+endif
 
 
 "*****************************************************************************
@@ -129,10 +132,29 @@ endif
 
 "*****************************************************************************
 " ENCRYPTION
+"
+" To use encryption use either :X or vim -x filename on CLI
+" default is zip if not specified
 "*****************************************************************************
 if has("cryptv")
-    if v:version > 704 || (v:version == 704 && has('patch401'))
-        set cryptmethod=blowfish2 " encrypt with :X, requested key is any pass you want
+    " While using encryption you may want to use the following settings to
+    " prevent leakage:
+    " set nobackup
+    " set nowritebackup
+    " set viminfo=
+    " set noswapfile
+    "
+    " Note: The text in memory is not encrypted. A system administrator may be
+    " able to see your text while you are editing it. When filtering text with
+    " ! ":!filter" or using ":w !command" the text is not encrypted, this may
+    " reveal ! it to others. The 'viminfo' file is not encrypted.
+    "
+    " WARNING: If you make a typo when entering the key and then write the
+    " file and exit, the text will be lost!
+    "
+    " Vim v7.4.399⁠or newer is needed to use blowfish2 encryption.
+    if v:version >= 740 && has("patch-7.4-399")
+        set cryptmethod=blowfish2
     endif
 endif
 
@@ -203,7 +225,7 @@ if b:workpc
     let g:pathogen_disabled = []
 
     " e.g., disable plantuml
-    "let g:pathogen_disabled = [plantuml]
+    "let g:pathogen_disabled = [plantuml-syntax]
 
     " e.g., vim-fugitive requires at least vim 8.0
     "if v:version < '800'
@@ -252,9 +274,11 @@ elseif has("macunix") || has("unix")
     endtry
 endif
 
-
-let g:load_doxygen_syntax=1 " enable doxygen syntax highlighting
-
+" this probably needs to go in autocmd since the doxygen.vim may not be loaded
+" until we use a filetype that uses doxygen (i.e., filetype=c.doxygen)
+if exists("g:load_doxygen_syntax")
+    let g:load_doxygen_syntax=1 " enable doxygen syntax highlighting
+endif
 
 if b:workpc
     if has("python")
@@ -411,9 +435,9 @@ if has("cscope")
 
     " path to exe
     if b:workpc
-        set cscopeprg=C:/opensource/bin/cscope.exe
+        set cscopeprg="C:/opensource/bin/cscope.exe"
     else
-        set cscopeprg=/usr/local/bin/cscope
+        set cscopeprg="/usr/local/bin/cscope"
     endif
 
     " cscopetag - use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
@@ -500,7 +524,6 @@ if &t_Co > 2
     " so be sure to set any custom highlighting anyplace AFTER this statement
     hi clear " reset all highlighting to the defaults
 
-
     if has("syntax") && !exists("g:syntax_on")
         syntax enable
     endif
@@ -524,10 +547,12 @@ if &t_Co > 2
     if &background == "light"
         hi normal cterm=none ctermfg=black ctermbg=white
         hi cursorline cterm=none ctermbg=254
+        hi cursorcolumn cterm=none ctermbg=254
     else
         "hi Normal cterm=none ctermfg=white ctermbg=black
         hi normal cterm=none ctermfg=7 ctermbg=black
         hi cursorline cterm=none ctermbg=17
+        hi cursorcolumn cterm=none ctermbg=17
         hi search cterm=bold ctermbg=yellow ctermfg=blue
         "hi search cterm=bold ctermbg=blue ctermfg=white
         hi incsearch cterm=bold ctermbg=yellow ctermfg=blue
@@ -542,34 +567,38 @@ if &t_Co > 2
         " color for the vertical split that separates windows
         if has("vertsplit")
             hi vertsplit cterm=none ctermbg=24
+            "hi vertsplit cterm=none ctermbg=8 " #808080 grey
+
+            " make the vert split a space instead of the default "|"
+            set fillchars=vert:\ " blank space 0x32
         endif
-
-        " color for the 80 char line limit vertical bar
-        hi colorcolumn ctermfg=none ctermbg=52
-
     endif " if &background == "dark"
 
-    " make the vert split a space instead of the default "|"
-    set fillchars=vert:\ " blank space 0x32
+    if has("syntax")
+        " set an indicator at textwidth to indicate wrapping
+        " 'colorcolumn' is a comma separated list of screen columns that are
+        " highlighted; example: set colorcolumn=4,80,120
+        " this is good but I may want to put this in an autocmd so when another
+        " buffer is entered that has a different textwidth set, the colorcolumn
+        " will auto-adjust
+        set colorcolumn=+2 " sets to &textwidth + 2
 
-    " set an indicator at textwidth to indicate wrapping
-    " 'colorcolumn' is a comma separated list of screen columns that are
-    " highlighted
-    "example: set colorcolumn=4,80,120
-    " this is good but I may want to put this in an autocmd so when another
-    " buffer is entered that has a different textwidth set, the colorcolumn
-    " will auto-adjust
-    set colorcolumn=+2 " sets to &textwidth + 2
+        " set end of line column marker to dark dark red (note: console uses
+        " xterm256 color names/numbers, 52 is equivalent to guibg=#5F0000)
+        hi colorcolumn ctermfg=none ctermbg=52
+        "hi colorcolumn ctermfg=fg ctermbg=4 " #000080 darkred
 
-    " turn off underlining line numbers
-    if v:version >= 800
-        set cursorlineopt=screenline
-    endif
+        " turn off underlining line numbers
+        if v:version >= 800
+            set cursorlineopt=screenline
+        endif
 
-    " Note that setting the 'cursorline' or 'cursorcolumn' options can cause
-    " Vim to respond slowly, especially for large files or files with long
-    " lines
-    set cursorline
+        " Note that setting the 'cursorline' or 'cursorcolumn' options can cause
+        " Vim to respond slowly, especially for large files or files with long
+        " lines
+        set cursorline   " horizontal line that follows the cursor
+        "set cursorcolumn " vertical line that follows the cursor
+    endif " has("syntax")
 
     if has("spell")
         " Word not recognized
@@ -587,7 +616,7 @@ if &t_Co > 2
         " Wrong spelling for selected region
         hi clear SpellLocal
         hi SpellLocal cterm=underline,bold ctermfg=yellow ctermbg=blue
-    endif
+    endif " has("spell")
 
     " if we aren't using airline plugin, change background color of status
     " line to indicate if the buffer has been modified
@@ -601,7 +630,7 @@ if &t_Co > 2
         endfunction
 
         au VimEnter,InsertLeave,InsertEnter,BufWritePost * call StatusLineColorChange()
-    end
+    endif " has("statusline") && !exists("g:loaded_airline")
 endif " if &t_Co > 2
 
 
@@ -644,10 +673,6 @@ endif
 function SetStartupOptions()
     "echom "vimrc Nr. of Colors: " . &t_Co
 
-    " set end of line column marker to dark dark red (note: console uses
-    " xterm256 color names/numbers, 52 is equivalent to guibg=#5F0000)
-    "hi colorcolumn ctermfg=fg ctermbg=52
-
     "-------------------------------------------------------------------------
     " Plugin: Fuzzy File Finder custom settings
     "-------------------------------------------------------------------------
@@ -664,17 +689,17 @@ function SetStartupOptions()
     "-------------------------------------------------------------------------
     " Plugin: WinResizer custom settings
     "-------------------------------------------------------------------------
-    let g:winresizer_vert_resize = 1
-    let g:winresizer_horiz_resize = 1
+    if exists("g:loaded_winresizer")
+        let g:winresizer_vert_resize = 1
+        let g:winresizer_horiz_resize = 1
+    endif
 
     "-------------------------------------------------------------------------
     " Plugin: vim-airline-themes custom settings
     "-------------------------------------------------------------------------
-    let g:airline_theme='papercolor'
-
-    echom "g:airline_theme=".g:airline_theme
-    echom "g:winresizer_vert_resize=".g:winresizer_vert_resize
-    echom "g:winresizer_horiz_resize=".g:winresizer_horiz_resize
+    if exists("g:loaded_airline")
+        let g:airline_theme='papercolor'
+    endif
 
     "-------------------------------------------------------------------------
     " Plugin: vim-markdown custom settings
@@ -738,7 +763,7 @@ if has("autocmd")
     " indent scripts.
     filetype plugin indent on
 
-    " execute upon entering vim, after .vimrc is parsed
+    " execute upon entering vim, after .vimrc is parsed and plug-ins loaded
     autocmd VimEnter * call SetStartupOptions()
 
     " using global g:load_doxygen_syntax instead
@@ -794,20 +819,20 @@ if has("autocmd")
         autocmd FileType text setlocal textwidth=78
 
         if b:workpc
-            " set when we edit AstroRT flat files or FSW autocoded input files
+            " set no text wrapping when we edit certain text file names
             autocmd BufRead *_decom.txt,*_tlmdb.txt,CMDMasterlist*.txt,CMDParameterM*.txt,auto_*.txt,fsw-*.txt setlocal nowrap tw=0 wm=0
         endif
 
         if has("spell")
-            autocmd BufRead *.txt setlocal spell " only spell check txt files
-            autocmd FileType markdown setlocal spell " Spell-check Markdown files
-            autocmd FileType gitcommit setlocal spell " Spell-check Git messages
+            " turn on spell check for text, markdown, and gitcommit files
+            autocmd FileType text,markdown,gitcommit setlocal spell
         endif
     augroup END
 
     augroup my_misc_group
         autocmd!
 
+        " special settings when using mutt to edit email files
         if !b:workpc
             autocmd BufNewFile,BufRead /tmp/*mutt* set noautoindent filetype=mail wm=0 tw=78 nonumber digraph nolist nopaste
         endif
@@ -840,6 +865,7 @@ nnoremap <Tab> :bnext<CR>
 nnoremap <S-Tab> :bprevious<CR>
 
 " Maps Alt-[s.v] to horizontal and vertical split respectively
+" TODO: not working on linux in vim terminal
 nnoremap <A-s> :split<CR>
 nnoremap <A-v> :vsplit<CR>
 nnoremap <A-t> :tabnew<CR>
@@ -856,6 +882,7 @@ nnoremap <C-k> <c-w>k
 nnoremap <C-l> <c-w>l
 
 " Maps Alt-[h,j,k,l] to re-sizing a window split
+" TODO: not working on linux in vim terminal
 if b:workpc || has("unix")
     nnoremap <A-h> <c-w>:vertical :resize -1<CR>
     nnoremap <A-j> <c-w>:resize +1<CR>
