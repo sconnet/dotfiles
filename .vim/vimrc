@@ -866,6 +866,7 @@ nnoremap <S-Tab> :bprevious<CR>
 
 " Maps Alt-[s.v] to horizontal and vertical split respectively
 " TODO: not working on linux in vim terminal
+" TODO: not working on MacOs in vim terminal
 nnoremap <A-s> :split<CR>
 nnoremap <A-v> :vsplit<CR>
 nnoremap <A-t> :tabnew<CR>
