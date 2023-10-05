@@ -24,6 +24,13 @@ if has("toolbar")
     set guioptions-=T  " hide toolbar
 endif
 
+" hide scrollbars
+set guioptions-=L  " hide left-hand scrollbar on vert split
+set guioptions-=R  " hide right-hand scrollbar on vert split
+set guioptions-=b  " hide bottom (horizontal) scrollbar is present
+set guioptions-=l  " hide left-hand scrollbar on vert split
+set guioptions-=r  " hide right-hand scrollbar
+
 set lines=38 columns=90
 
 if has('macunix')
@@ -35,57 +42,79 @@ else
     set guifont=Roboto_Mono:h10:cANSI
 endif
 
+" be careful because this will clear any highlighting you've already set,
+" so be sure to set any custom highlighting anyplace AFTER this statement
+hi clear " reset all highlighting to the defaults
+
 " bright foreground for dark colorschemes
 set background=dark
 
-" other great options:
-"     torte,desert,solarized,darkblue,badwolf,asu1dark,lucius,obsidian,dosbox-black
-colorscheme torte
+" other great options: lucius and dosbox-black
+colorscheme meta5
 
-if &background == 'light'
-    hi normal gui=none guifg=black guibg=white
-    hi cursorline gui=none guibg=darkblue
-else
-    hi normal gui=none guifg=white guibg=black
-    hi cursorline gui=none guibg=darkblue
-    hi search gui=none guifg=fg guibg=DeepSkyBlue4
-    hi incsearch gui=bold guifg=fg guibg=DeepSkyBlue4
-    hi cursearch gui=bold guifg=fg guibg=DeepSkyBlue4
+" do this before customizing colors since this has it's own colors it wants to
+" use
+if has("syntax") && !exists("g:syntax_on")
+    syntax enable
+endif
 
-    if has('visual')
-        hi visual guibg=grey
+"*****************************************************************************
+" CUSTOMIZATION INCLUDING COLOR CHOICES
+" see C:\opensource\Vim\vim74\rgb.txt
+"*****************************************************************************
+hi normal gui=none guifg=grey guibg=black
+hi search gui=none guifg=fg guibg=DeepSkyBlue4
+
+if has("syntax")
+    set colorcolumn=+2 " sets to &textwidth + 2
+    if v:version >= 800
+        set cursorlineopt=screenline
     endif
+    set cursorline   " horizontal line that follows the cursor
+    "set cursorcolumn " vertical line that follows the cursor
 
     " really dark red (R=32h G=00h B=00h)
     hi colorcolumn guifg=fg guibg=#320000
+    hi cursorline gui=none guibg=darkblue
+endif
+
+if has("extra_search")
+    set hlsearch    " highlight all search results
+    set incsearch   " show incremental search results as you type
+
+    hi incsearch gui=bold guifg=fg guibg=DeepSkyBlue4
+    hi cursearch gui=bold guifg=fg guibg=DeepSkyBlue4
+endif
+
+if has('visual')
+    hi visual guifg=black guibg=grey
 endif
 
 if has('vertsplit')
-    hi vertsplit guibg=DeepSkyBlue4
+    " make the vert split a blank space 0x32 instead of the default "|"
+    set fillchars=vert:\ " blank space 0x32
+    hi vertsplit gui=none guibg=DeepSkyBlue4
 endif
 
 if has('spell')
     " Word not recognized
     hi clear SpellBad
     hi SpellBad gui=undercurl,bold guifg=black guibg=white
-    "hi SpellBad gui=underline guifg=lightblue
 
     " Word not capitalized
     hi clear SpellCap
     hi SpellCap gui=undercurl,bold guifg=red guibg=yellow
-    "hi SpellCap gui=underline guifg=red
 
     " Word is rare
     hi clear SpellRare
     hi SpellRare gui=undercurl,bold guifg=black guibg=green
-    "hi SpellRare gui=underline guifg=green
 
     " Wrong spelling for selected region
     hi clear SpellLocal
     hi SpellLocal gui=undercurl,bold guifg=yellow guibg=blue
-    "hi SpellLocal gui=underline guifg=yellow
 endif
 
+" not needed if we are using airline plugin
 if has('statusline') && !exists('g:loaded_airline')
     hi statusline guifg=white guibg=DeepSkyBlue4
 endif

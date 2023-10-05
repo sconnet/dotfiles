@@ -66,6 +66,9 @@
 "
 " Output to :messages
 " :echom "Hello World"
+"
+" Swap Windows
+" C-w x
 " ----------------------------------------------------------------------------
 
 " Use Vim settings, rather than Vi settings (much better!). This must be
@@ -152,7 +155,7 @@ if has("cryptv")
     " WARNING: If you make a typo when entering the key and then write the
     " file and exit, the text will be lost!
     "
-    " Vim v7.4.399⁠or newer is needed to use blowfish2 encryption.
+    " Vim v7.4.399 or newer is needed to use blowfish2 encryption.
     if v:version >= 740 && has("patch-7.4-399")
         set cryptmethod=blowfish2
     endif
@@ -217,6 +220,18 @@ endif
 " https://github.com/junegunn/vim-plug
 "*****************************************************************************
 if b:workpc
+    " Plugins in vimfiles\bundle\
+    " Items with a ~ in the suffex means it is disabled and pathogen will not
+    " loaded it.
+    "     cmake~
+    "     cscope
+    "     gcc~
+    "     markdown
+    "     plantuml-syntax
+    "     vim-airline-master
+    "     vim-airline-themes-master
+    "     winresizer-master
+    "     xml~
 
     " Using Pathogen at work
     execute pathogen#infect()
@@ -264,6 +279,7 @@ elseif has("macunix") || has("unix")
         Plug 'preservim/vim-markdown'
         Plug 'dr-kino/cscope-maps'
         Plug 'jamessan/vim-gnupg'
+        Plug 'christophermca/meta5'
         call plug#end()
 
         " Tagbar custom settings '\t' to activate
@@ -524,55 +540,65 @@ if &t_Co > 2
     " so be sure to set any custom highlighting anyplace AFTER this statement
     hi clear " reset all highlighting to the defaults
 
+    set background=dark " bright foreground for dark colorschemes
+
+    if &t_Co >= 256
+        colorscheme meta5
+    else
+        colorscheme pablo
+    endif
+
     if has("syntax") && !exists("g:syntax_on")
         syntax enable
     endif
 
+    " ---------------------------------------------------------------------
+    " override some colorscheme elements with my own preferences
+    " t_Co=16 on Win32 vim terminal at work
+    " t_Co=256 on Linux vim terminal
+    " t_Co=16,777,216 on MacOs vim terminal
+    " ---------------------------------------------------------------------
     if has("extra_search")
         set hlsearch    " highlight all search results
         set incsearch   " show incremental search results as you type
     endif
 
-    set background=dark " bright foreground for dark colorschemes
-    "colorscheme pablo
-    colorscheme torte
+    " fg=7|lightgrey|#C0C0C0 bg=0|black|#000000
+    hi normal cterm=none ctermfg=7 ctermbg=0
 
-    " ---------------------------------------------------------------------
-    " override some colorscheme elements with my own preferences
-    " ---------------------------------------------------------------------
-    " normal colors when "fg" and "bg" are specified
-    "    hi Normal term=none      cterm=none
-    "    hi Normal ctermfg=white  ctermbg=0
-    "    hi Normal guifg=white    guibg=black
-    if &background == "light"
-        hi normal cterm=none ctermfg=black ctermbg=white
-        hi cursorline cterm=none ctermbg=254
-        hi cursorcolumn cterm=none ctermbg=254
-    else
-        "hi Normal cterm=none ctermfg=white ctermbg=black
-        hi normal cterm=none ctermfg=7 ctermbg=black
+    if &t_Co > 16
+        " bg=17|darkblue|#00005F
         hi cursorline cterm=none ctermbg=17
         hi cursorcolumn cterm=none ctermbg=17
-        hi search cterm=bold ctermbg=yellow ctermfg=blue
-        "hi search cterm=bold ctermbg=blue ctermfg=white
-        hi incsearch cterm=bold ctermbg=yellow ctermfg=blue
-        "hi incsearch cterm=bold ctermbg=blue ctermfg=white
-        hi cursearch cterm=bold ctermbg=yellow ctermfg=blue
-        "hi cursearch cterm=bold ctermbg=blue ctermfg=white
+    else
+        " bg=1|darkblue|#800000
+        hi cursorline cterm=none ctermbg=1
+        hi cursorcolumn cterm=none ctermbg=1
+    endif
 
-        if has("visual")
-            hi visual cterm=none ctermfg=black ctermbg=grey
-        endif
+    " fg=9|blue|#FF0000 bg=14|yellow|#00FFFF
+    hi search cterm=bold ctermfg=9 ctermbg=14
+    hi incsearch cterm=bold ctermfg=9 ctermbg=14
+    hi cursearch cterm=bold ctermfg=9 ctermbg=14
 
-        " color for the vertical split that separates windows
-        if has("vertsplit")
+    if has("visual")
+        " fg=0|black|#000000 bg=7|lightgrey|#C0C0C0
+        hi visual cterm=none ctermfg=0 ctermbg=7
+    endif
+
+    " color for the vertical split that separates windows
+    if has("vertsplit")
+        " make the vert split a blank space 0x32 instead of the default "|"
+        set fillchars=vert:\ " blank space 0x32
+
+        if &t_Co > 16
+            " bg=24|???|#005F87
             hi vertsplit cterm=none ctermbg=24
-            "hi vertsplit cterm=none ctermbg=8 " #808080 grey
-
-            " make the vert split a space instead of the default "|"
-            set fillchars=vert:\ " blank space 0x32
+        else
+            " bg=8|grey|#808080
+           hi vertsplit cterm=none ctermbg=8
         endif
-    endif " if &background == "dark"
+    endif
 
     if has("syntax")
         " set an indicator at textwidth to indicate wrapping
@@ -585,8 +611,13 @@ if &t_Co > 2
 
         " set end of line column marker to dark dark red (note: console uses
         " xterm256 color names/numbers, 52 is equivalent to guibg=#5F0000)
-        hi colorcolumn ctermfg=none ctermbg=52
-        "hi colorcolumn ctermfg=fg ctermbg=4 " #000080 darkred
+        if &t_Co > 16
+            " bg=52|darkred|#5F0000
+            hi colorcolumn ctermfg=none ctermbg=52
+        else
+            " bg=4|red|#000080
+            hi colorcolumn ctermfg=fg ctermbg=4
+        endif
 
         " turn off underlining line numbers
         if v:version >= 800
@@ -602,41 +633,48 @@ if &t_Co > 2
 
     if has("spell")
         " Word not recognized
+        " bg=15|white|#FFFFFF
         hi clear SpellBad
         hi SpellBad cterm=underline,bold ctermfg=0 ctermbg=15
 
         " Word not capitalized
+        " fg=4|red|#000080 bg=14|yellow|#00FFFF
         hi clear SpellCap
-        hi SpellCap cterm=underline,bold ctermfg=red ctermbg=yellow
+        hi SpellCap cterm=underline,bold ctermfg=4 ctermbg=14
 
         " Word is rare
+        " fg=0|black|#000000 bg=2|brightgreen|#00FF00
         hi clear SpellRare
-        hi SpellRare cterm=underline,bold ctermfg=0 ctermbg=green
+        hi SpellRare cterm=underline,bold ctermfg=0 ctermbg=10
 
         " Wrong spelling for selected region
+        " fg=14|brightyellow|#00FFFF fg=9|brightblue|#FF0000
         hi clear SpellLocal
-        hi SpellLocal cterm=underline,bold ctermfg=yellow ctermbg=blue
+        hi SpellLocal cterm=underline,bold ctermfg=14 ctermbg=9
     endif " has("spell")
-
-    " if we aren't using airline plugin, change background color of status
-    " line to indicate if the buffer has been modified
-    if has("statusline") && !exists("g:loaded_airline")
-        function StatusLineColorChange()
-            if &mod == 1
-                hi statusline cterm=none ctermfg=white ctermbg=darkred
-            else
-                hi statusline cterm=none ctermfg=white ctermbg=22 " darkgreen
-             endif
-        endfunction
-
-        au VimEnter,InsertLeave,InsertEnter,BufWritePost * call StatusLineColorChange()
-    endif " has("statusline") && !exists("g:loaded_airline")
 endif " if &t_Co > 2
+
 
 
 "*****************************************************************************
 " STATUSLINE CUSTOMIZATION
 "*****************************************************************************
+" if we aren't using airline plugin, change background color of status
+" line to indicate if the buffer has been modified
+if has("statusline") && !exists("g:loaded_airline")
+    function StatusLineColorChange()
+        if &mod == 1
+            " fg=15|white|#FFFFFF bg=4|red|#000080
+            hi statusline cterm=none ctermfg=15 ctermbg=4
+        else
+            " fg=15|white|#FFFFFF bg=22|darkgreen|#005F00
+            hi statusline cterm=none ctermfg=15 ctermbg=22
+        endif
+    endfunction
+
+    au VimEnter,InsertLeave,InsertEnter,BufWritePost * call StatusLineColorChange()
+endif " has("statusline") && !exists("g:loaded_airline")
+
 if has("statusline") && !exists("g:loaded_airline")
     set laststatus=2                                " set the bottom status bar
     set statusline=%f                               " file name
@@ -884,6 +922,8 @@ nnoremap <C-l> <c-w>l
 
 " Maps Alt-[h,j,k,l] to re-sizing a window split
 " TODO: not working on linux in vim terminal
+" TODO: not working on MacOs in vim terminal
+" TODO: not working on Win32 in vim terminal
 if b:workpc || has("unix")
     nnoremap <A-h> <c-w>:vertical :resize -1<CR>
     nnoremap <A-j> <c-w>:resize +1<CR>
