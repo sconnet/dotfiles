@@ -559,9 +559,6 @@ if &t_Co > 2
 
     " ---------------------------------------------------------------------
     " override some colorscheme elements with my own preferences
-    " t_Co=16 on Win32 vim terminal at work
-    " t_Co=256 on Linux vim terminal
-    " t_Co=16,777,216 on MacOs vim terminal
     " ---------------------------------------------------------------------
     if has("extra_search")
         set hlsearch    " highlight all search results
@@ -571,6 +568,8 @@ if &t_Co > 2
     " fg=7|lightgrey|#C0C0C0 bg=0|black|#000000
     hi normal cterm=none ctermfg=7 ctermbg=0
 
+    " t_Co=16 on Win32 vim terminal at work
+    " t_Co=256 on Linux and MacOS vim terminal
     if &t_Co > 16
         " bg=17|darkblue|#00005F
         hi cursorline cterm=none ctermbg=17

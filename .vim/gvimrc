@@ -33,13 +33,15 @@ set guioptions-=r  " hide right-hand scrollbar
 
 set lines=38 columns=90
 
-if has('macunix')
+if has("macunix")
     set macligatures
     set guifont=Fira_Code:h16
-elseif has('unix')
+elseif has("unix")
     set guifont=Ubuntu\ Mono\ 12
-else
+elseif has("win32")
     set guifont=Roboto_Mono:h10:cANSI
+else
+    " use default
 endif
 
 " be careful because this will clear any highlighting you've already set,
