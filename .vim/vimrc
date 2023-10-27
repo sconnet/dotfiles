@@ -514,6 +514,11 @@ endif
 if has("mouse")
     set mouse=a  " use mouse in all modes (n,v,i,c,h see help mouse)
     behave mswin
+
+    " Prevent CTRL-F to abort the selection (in visual mode). This is caused
+    " by ':behave mswin' which sets 'keymodel' to include 'stopsel' which
+    " means that non-shifted special keys stop selection.
+    set keymodel=startsel
 endif
 
 
@@ -861,9 +866,10 @@ if has("autocmd")
             autocmd BufRead *_decom.txt,*_tlmdb.txt,CMDMasterlist*.txt,CMDParameterM*.txt,auto_*.txt,fsw-*.txt setlocal nowrap tw=0 wm=0
         endif
 
+        " eh, this is a pain - do not turn off automatically
         if has("spell")
             " turn on spell check for text, markdown, and gitcommit files
-            autocmd FileType text,markdown,gitcommit setlocal spell
+            "autocmd FileType text,markdown,gitcommit setlocal spell
         endif
     augroup END
 
