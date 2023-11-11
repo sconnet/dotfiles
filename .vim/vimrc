@@ -519,6 +519,7 @@ endif
 if has("mouse")
     set mouse=a  " use mouse in all modes (n,v,i,c,h see help mouse)
     behave mswin
+
     " Prevent CTRL-F to abort the selection (in visual mode). This is caused
     " by ':behave mswin' which sets 'keymodel' to include 'stopsel' which
     " means that non-shifted special keys stop selection.
