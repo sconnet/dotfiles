@@ -165,7 +165,7 @@ endif
 "*****************************************************************************
 " ABBREVIATIONS
 "*****************************************************************************
-ab SJC Steve Connet
+"ab SJC Steve Connet
 "unab SJC
 
 
@@ -423,6 +423,9 @@ endif
 if has("wildmenu")
     set wildmenu     " command line auto completion when hitting <tab>
     set wildmode=list:longest,longest:full   " Better command line completion
+    if v:version >= 900
+        set wildoptions=pum
+    endif
 endif
 
 
@@ -449,19 +452,20 @@ if has("cscope")
     " :help cscope_options
     "set cscopequickfix=s-,c-,d-,i-,t-,e-
 
-    " path to exe
-    if b:workpc
-        set cscopeprg="C:/opensource/bin/cscope.exe"
-    else
-        set cscopeprg="/usr/local/bin/cscope"
-    endif
+    " path to exe - THIS DOESN"T WORK, CAUSES THE FOLLOWING ERROR ON WIN32:
+    " E623: Could not spawn cscope process
+    "if b:workpc
+    "   set cscopeprg="opensource/bin/cscope.exe"
+    "else
+    "    set cscopeprg="/usr/local/bin/cscope"
+    "endif
 
     " cscopetag - use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
     set cst
 
     " cscopetagorder - check cscope for definition of a symbol before checking
     " ctags: set to 1 if you want the reverse search order.
-    set csto=0
+    set csto=1
 
     " cscopepathcomp - how many components of a file's path to display.
     set cspc=3
@@ -472,6 +476,7 @@ if has("cscope")
     else " search cscope.out elsewhere
         let cscope_file=findfile("cscope.out", ".;")
         if !empty(cscope_file) && filereadable(cscope_file)
+            "echom "Found cscope file: ".cscope_file
             exe "cs add" cscope_file
         else " cscope file not found
             if $CSCOPE_DB != ""
@@ -514,6 +519,10 @@ endif
 if has("mouse")
     set mouse=a  " use mouse in all modes (n,v,i,c,h see help mouse)
     behave mswin
+    " Prevent CTRL-F to abort the selection (in visual mode). This is caused
+    " by ':behave mswin' which sets 'keymodel' to include 'stopsel' which
+    " means that non-shifted special keys stop selection.
+    set keymodel=startsel
 endif
 
 
@@ -541,7 +550,6 @@ if &t_Co > 2
     hi clear " reset all highlighting to the defaults
 
     set background=dark " bright foreground for dark colorschemes
-
     if &t_Co >= 256
         colorscheme meta5
     else
@@ -860,9 +868,10 @@ if has("autocmd")
             autocmd BufRead *_decom.txt,*_tlmdb.txt,CMDMasterlist*.txt,CMDParameterM*.txt,auto_*.txt,fsw-*.txt setlocal nowrap tw=0 wm=0
         endif
 
+        " eh, this is a pain - do not turn on automatically
         if has("spell")
             " turn on spell check for text, markdown, and gitcommit files
-            autocmd FileType text,markdown,gitcommit setlocal spell
+            "autocmd FileType text,markdown,gitcommit setlocal spell
         endif
     augroup END
 
