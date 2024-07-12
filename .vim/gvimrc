@@ -35,9 +35,10 @@ set lines=38 columns=90
 
 if has('macunix')
     set macligatures
-    set guifont=Fira_Code:h16
+    "set guifont=Fira_Code:h16
+    set guifont=Menlo-Regular:h14
 elseif has('unix')
-    set guifont=Ubuntu\ Mono\ 12
+    "set guifont=Ubuntu\ Mono\ 12
 elseif has("win32")
     set guifont=IBM_Plex_Mono:h11:cANSI
 else
@@ -52,7 +53,8 @@ hi clear " reset all highlighting to the defaults
 set background=dark
 
 " other great options: lucius and dosbox-black
-colorscheme meta5
+"colorscheme meta5
+colorscheme pablo
 
 " do this before customizing colors since this has it's own colors it wants to
 " use

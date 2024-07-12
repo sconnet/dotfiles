@@ -552,7 +552,8 @@ if &t_Co > 2
 
     set background=dark " bright foreground for dark colorschemes
     if &t_Co >= 256
-        colorscheme meta5
+        "colorscheme meta5
+        colorscheme pablo
     else
         colorscheme pablo
     endif

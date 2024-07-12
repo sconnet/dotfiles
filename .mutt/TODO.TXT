@@ -1,2 +1,2 @@
-Redact personal info in mutt configuration files before uploading.
-
+1. Redact personal info in mutt configuration files before uploading.
+2. Update cox ISP to use yahoo mail.
