@@ -17,5 +17,8 @@
 #     /etc/zlogout       - if login shell exits
 #
 # if $ZDOTDIR is not set, then $HOME is used
+#
+# This is sourced if we are a login shell
+#
 #-----------------------------------------------------------------------
 

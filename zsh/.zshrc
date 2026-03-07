@@ -1,4 +1,3 @@
-#!/bin/zsh
 #-----------------------------------------------------------------------
 # $ZDOTDIR/.zshrc
 #
@@ -17,6 +16,7 @@
 #     /etc/zlogout       - if login shell exits
 #
 # if $ZDOTDIR is not set, then $HOME is used
+# .zshrc
 #
 # setopt is equivalent to set -o in ksh; this is a special builtin by the
 # POSIX standard
@@ -25,6 +25,14 @@
 # myvar=myvalue
 # myarray=('first element', 'second element')
 # print $myarray[2]
+#
+# functions look like this:
+# fn() {
+# ... do something ...
+# }
+# call function like this:
+# fn
+#
 #-----------------------------------------------------------------------
 
 # silent on error
@@ -79,114 +87,37 @@ setopt extended_history
 bindkey -v # vi mode
 #setopt vi
 
-export KEYTIMEOUT=1
-
-# Use a default width of 80 for manpages for more convenient reading
-export MANWIDTH=${MANWIDTH:-80}
-
-# see man ls
-export CLICOLOR=1
-export LSCOLORS=GxFxCxDxBxegedabagaced
-export ALTERNATE_EDITOR="vi"
-export EDITOR="vim"
-export VISUAL="gvim"
-export GIT_EDITOR="vim"
-#export ANDROID_HOME=$HOME/Library/Android/sdk
-export ANDROID_HOME=$HOME/adb
-export GPG_TTY=$TTY
-
-# turn off brew from phoning home with analytics
-export HOMEBREW_NO_ANALYTICS=1
-
-# don't let less clear the screen
-export PAGER="less -X"
-
-export GUILE_LOAD_PATH=/usr/local/share/guile/site/3.0
-export GUILE_LOAD_COMPILED_PATH=/usr/local/lib/guile/3.0/site-ccache
-export GUILE_SYSTEM_EXTENSIONS_PATH=/usr/local/lib/guile/3.0/extensions
-
-path=(
-    $path
-    $HOME/bin
-    $ANDROID_HOME/platform-tools
-    $ANDROID_HOME/tools
-    /opt/local/bin
-    /usr/local/opt/ncurses/bin
-    /usr/local/opt/python/libexec/bin
-    /usr/local/opt/ruby/bin
-    /usr/local/opt/sqlite/bin
-    /usr/local/opt/tcl-tk/bin
-    /usr/local/sbin
-    /usr/local/opt/icu4c/bin
-    /usr/local/opt/openssl@1.1/bin
-    /Users/clu/Library/Python/3.8/bin
-)
-export PATH
-
-# prepend to path - autodetect path and env vars for both pyenv and perl
-#eval "$(pyenv init -)"
-#eval "$(perl -I$HOME/perl5/lib/perl5 -Mlocal::lib=$HOME/perl5)"
-
-# support colors in less
-export LESS_TERMCAP_us=$'\E[01;32m'
-
-# support extensions for pass
-export PASSWORD_STORE_ENABLE_EXTENSIONS=true
-
-# add another directory for zsh completions
-#fpath+=~/.zfunc
-
-# automatically remove duplicates from these arrays
-typeset -U cdpath cppflags fpath ldflags manpath path
-
-# set browser environment variable
-export BROWSER=open
-
-# enable colors and change prompt:
-autoload -U colors && colors
-
 # support mass rename files
 autoload zmv
 
 # support CLI calculator
 autoload zcalc
 
-RED=$fg[red]
-BLUE=$fg[blue]
-GREEN=$fg[green]
-MAGENTA=$fg[magenta]
-YELLOW=$fg[yellow]
-RESET_COLOR=$reset_color
-#PS1="%B%{$RED%}[%{$YELLOW%}%n%{$GREEN%}@%{$BLUE%}%M %{$MAGENTA%}%~%{$RED%}]%{$RESET_COLOR%}%b "
-#PS1="%{$fg[red]%}%n%{$reset_color%}@%{$fg[blue]%}%m %{$fg[yellow]%}%(5~|%-1~/.../%3~|%4~) %{$reset_color%}%% "
+path=(
+    $path
+    $HOME/bin
+    /opt/homebrew/bin
+    /opt/homebrew/opt/openssl/bin
+)
+export PATH
 
-# built in color schemes for prompt
-#autoload -U promptinit && promptinit
+# setup aliases
+[[ -f ~/zsh/promptrc ]] && source ~/zsh/promptrc
 
-# list all color schemes
-#prompt -p
-# adam1 adam2 bart bigfade clint default elite2 elite fade fire off oliver pws
-# redhat restore suse walters zefram prompt bigfade red white
-
-# %F{xxx} is foreground color
-# %K{xxx} is background color
-#PS1="%F{214}%K{000}%m%F{015}%K{000}:%F{039}%K{000}%~%F{015}%K{000}\$ "
-PS1="%F{214}%m%F{015}:%F{039}%~%F{015}\$ "
-
-# environment variables for RUST
-[[ -f ~/.cargo/env ]] && . ~/.cargo/env
+# setup aliases
+[[ -f ~/zsh/aliasrc ]] && source ~/zsh/aliasrc
 
 # set CPPFlags and friends
-[[ -f ~/.buildflags.zsh ]] && . ~/.buildflags.zsh
+[[ -f ~/zsh/buildflagrc ]] && source ~/zsh/buildflagrc
 
-# set aliases
-[[ -f ~/.aliasrc.zsh ]] && . ~/.aliasrc.zsh
-
-# declare functions
-[[ -f ~/.functions.zsh ]] && . ~/.functions.zsh
+# set functions
+[[ -f ~/zsh/securityrc ]] && source ~/zsh/securityrc
 
 # set security related environment variables
-[[ -f ~/.security.zsh ]] && . ~/.security.zsh
+[[ -f ~/zsh/functionrc ]] && source ~/zsh/functionrc
 
 # set fuzzy file finder things
-[[ -f ~/.fzf.zsh ]] && . ~/.fzf.zsh
+[[ -f ~/zsh/fzfrc ]] && source ~/zsh/fzfrc
+
+# automatically remove duplicates from these arrays
+typeset -U cdpath cppflags fpath ldflags manpath path

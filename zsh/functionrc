@@ -1,5 +1,8 @@
 #!/bin/zsh
+
 #-----------------------------------------------------------------------
+# functionrc
+#
 # functions look like this:
 # fn() {
 # ... do something ...
@@ -29,3 +32,4 @@ if [[ `uname` == "Darwin" ]]; then
         ps=`mktemp -t manpageXXXX`.ps ; man -t $@ > "$ps" ; open "$ps" ;
     }
 fi
+

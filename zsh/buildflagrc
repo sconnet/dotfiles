@@ -1,6 +1,10 @@
 #!/bin/zsh
 
 #-----------------------------------------------------------------------------
+# buildflagrc
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 # SUMMARY:
 #    CFLAGS          C compiler
 #    CPPFLAGS        Preprocessor and compiler
@@ -38,13 +42,18 @@
 # CFLAGS=-std=c99 -Wall
 # CXXFLAGS=-Weffc++
 #-----------------------------------------------------------------------------
-CPATH+=/usr/local/opt/libffi/include:
-CPATH+=/usr/local/opt/ncurses/include:
-CPATH+=/usr/local/opt/readline/include:
-CPATH+=/usr/local/opt/sqlite/include:
-CPATH+=/usr/local/opt/tcl-tk/include:
-CPATH+=/usr/local/opt/icu4c/include:
-CPATH+=/usr/local/opt/openssl@1.1/include:
+#CPATH+=/usr/local/opt/zlib/include:
+#CPATH+=/usr/local/opt/libffi/include:
+#CPATH+=/usr/local/opt/ncurses/include:
+#CPATH+=/usr/local/opt/readline/include:
+#CPATH+=/usr/local/opt/sqlite/include:
+#CPATH+=/usr/local/opt/tcl-tk/include:
+#CPATH+=/usr/local/opt/icu4c/include:
+#CPATH+=/usr/local/opt/openssl@1.1/include:
+CPATH=(
+    /opt/homebrew/opt/openssl/include
+    /opt/homebrew/opt/readline/include
+)
 export CPATH
 
 #-----------------------------------------------------------------------------
@@ -59,13 +68,17 @@ export CPATH
 # EXAMPLE:
 # LDFLAGS=-L/usr/local/opt/lib
 #-----------------------------------------------------------------------------
-LIBRARY_PATH+=/usr/local/opt/libffi/lib:
-LIBRARY_PATH+=/usr/local/opt/ncurses/lib:
-LIBRARY_PATH+=/usr/local/opt/readline/lib:
-LIBRARY_PATH+=/usr/local/opt/sqlite/lib:
-LIBRARY_PATH+=/usr/local/opt/tcl-tk/lib:
-LIBRARY_PATH+=/usr/local/opt/icu4c/lib:
-LIBRARY_PATH+=/usr/local/opt/openssl@1.1/lib:
+#LIBRARY_PATH+=/usr/local/opt/libffi/lib:
+#LIBRARY_PATH+=/usr/local/opt/ncurses/lib:
+#LIBRARY_PATH+=/usr/local/opt/readline/lib:
+#LIBRARY_PATH+=/usr/local/opt/sqlite/lib:
+#LIBRARY_PATH+=/usr/local/opt/tcl-tk/lib:
+#LIBRARY_PATH+=/usr/local/opt/icu4c/lib:
+#LIBRARY_PATH+=/usr/local/opt/openssl@1.1/lib:
+LIBRARY_PATH=(
+    /opt/homebrew/opt/openssl/lib
+    /opt/homebrew/opt/readline/lib
+)
 export LIBRARY_PATH
 
 #-----------------------------------------------------------------------------
@@ -103,13 +116,17 @@ export LIBRARY_PATH
 #     /usr/lib/pkgconfig:
 #     /usr/local/Homebrew/Library/Homebrew/os/mac/pkgconfig/11.0:
 #-----------------------------------------------------------------------------
-PKG_CONFIG_PATH+=/usr/local/opt/libffi/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/ncurses/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/readline/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/sqlite/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/tcl-tk/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/icu4c/lib/pkgconfig:
-PKG_CONFIG_PATH+=/usr/local/opt/openssl@1.1/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/libffi/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/ncurses/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/readline/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/sqlite/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/tcl-tk/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/icu4c/lib/pkgconfig:
+#PKG_CONFIG_PATH+=/usr/local/opt/openssl@1.1/lib/pkgconfig:
+PKT_CONFIG_PATH=(
+    /opt/homebrew/opt/openssl/lib/pkgconfig
+    /opt/homebrew/opt/readline/lib/pkgconfig
+)
 export PKG_CONFIG_PATH
 
 #-----------------------------------------------------------------------------

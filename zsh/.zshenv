@@ -27,6 +27,7 @@
 #-----------------------------------------------------------------------
 
 # Put all commands in between this if
-#if [[ ! -o norcs ]]; then
-#    path=(~/bin $path)
-#fi
+if [[ ! -o norcs ]]; then
+    path=(~/bin $path)
+fi
+
